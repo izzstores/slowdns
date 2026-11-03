@@ -9,5 +9,7 @@ INSTALL_DIR=/root/slowdns
 mkdir -p "$INSTALL_DIR"
 curl -fsSL "$BASE/slowdns" -o "$INSTALL_DIR/slowdns"
 curl -fsSL "$BASE/slowdns-install.sh" -o "$INSTALL_DIR/install.sh"
+curl -fsSL "https://raw.githubusercontent.com/izzstores/slowdns/main/sd.sh" -o /usr/local/sbin/sd
 chmod 700 "$INSTALL_DIR" "$INSTALL_DIR/slowdns" "$INSTALL_DIR/install.sh"
+chmod 755 /usr/local/sbin/sd
 exec bash "$INSTALL_DIR/install.sh" install

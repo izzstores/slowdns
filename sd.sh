@@ -23,7 +23,14 @@ export TIME="10"
 export URL="https://api.telegram.org/bot$KEY/sendMessage"
 ISP=$(curl -s ipinfo.io/org | cut -d " " -f 2-10 )
 CITY=$(curl -s ipinfo.io/city )
-domain=$(cat /etc/xray/domain)
+SLOWDNS_DIR=/root/slowdns
+ENV_FILE="$SLOWDNS_DIR/slowdns.env"
+PUB_FILE="$SLOWDNS_DIR/server.pub"
+[ -r "$ENV_FILE" ] || { echo "Konfigurasi SlowDNS tidak ditemukan: $ENV_FILE" >&2; exit 1; }
+[ -r "$PUB_FILE" ] || { echo "Public key SlowDNS tidak ditemukan: $PUB_FILE" >&2; exit 1; }
+# Read only the installer-generated domain; never generate a random host.
+domain=$(awk -F= '$1=="SLOWDNS_DOMAIN" {gsub(/^"|"$/, "", $2); print $2; exit}' "$ENV_FILE")
+[ -n "$domain" ] || { echo "SLOWDNS_DOMAIN belum diatur di $ENV_FILE" >&2; exit 1; }
 clear
 echo -e "\033[1;93m┌───────────────────────────┐\033[0m"
 read -p "   Username      : " Login
@@ -33,9 +40,9 @@ echo -e "\033[1;93m└───────────────────�
 IP=$(wget -qO- ipinfo.io/ip);
 # // String For IP & Port
 IP=$(curl -sS ifconfig.me);
-domen=$(cat /etc/xray/domain)
-NS=$( cat /etc/xray/dns )
-PUB=$( cat /etc/slowdns/server.pub )
+domen="$domain"
+NS="$domain"
+PUB=$(cat "$PUB_FILE")
 ws="$(cat ~/log-install.txt | grep -w "Websocket SSH TLS" | cut -d: -f2|sed 's/ //g')"
 ws2="$(cat ~/log-install.txt | grep -w "Websocket SSH HTTP" | cut -d: -f2|sed 's/ //g')"
 
