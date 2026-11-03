@@ -1,20 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-rm -f $0
-apt update
-apt install curl -y
-apt install jq -y
+# Compatibility installer: use the maintained custom-domain installer.
+BASE="https://raw.githubusercontent.com/izzstores/izz_kun/main/Fls"
+INSTALL_DIR=/root/slowdns
 
-curl -sL "https://raw.githubusercontent.com/izzstores/slowdns/main/slowdns.sh" -o /tmp/slowdns.sh
-chmod +x /tmp/slowdns.sh
-bash /tmp/slowdns.sh
-
-clear
-echo " Prosess Installasi Slowdns"
-
-curl -sL "https://raw.githubusercontent.com/izzstores/slowdns/main/sd.sh" -o /usr/bin/sd
-chmod +x /usr/bin/sd
-
-clear
-echo -e " Prosess Installasi Slowdns Success"
-echo -e " Silahkan ketik ( sd ) tanpa tanda kurung"
+[ "$(id -u)" = 0 ] || { echo "Jalankan sebagai root." >&2; exit 1; }
+mkdir -p "$INSTALL_DIR"
+curl -fsSL "$BASE/slowdns" -o "$INSTALL_DIR/slowdns"
+curl -fsSL "$BASE/slowdns-install.sh" -o "$INSTALL_DIR/install.sh"
+chmod 700 "$INSTALL_DIR" "$INSTALL_DIR/slowdns" "$INSTALL_DIR/install.sh"
+exec bash "$INSTALL_DIR/install.sh" install
